@@ -1,1 +1,6 @@
-# Server
+# Application
+
+```
+npm install
+npm start
+```

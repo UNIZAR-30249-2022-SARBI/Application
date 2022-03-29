@@ -8,7 +8,7 @@ export class RabbitMQService {
   ) {}
 
     public send(pattern: string, data: any) {
-        console.log("Sending to server");
+        console.log("Sending to server" + JSON.stringify(data));
         return this.client.send(pattern, data).toPromise();
     }
 }

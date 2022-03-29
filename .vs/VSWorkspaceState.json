@@ -1,8 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\src"
+    "\\src",
+    "\\src\\service",
+    "\\test"
   ],
-  "SelectedNode": "\\src\\app.controller.ts",
+  "SelectedNode": "\\src\\service\\createCalendar.js",
   "PreviewInSolutionExplorer": false
 }

@@ -7,7 +7,7 @@ export type DayData = {
     day: string;
     week: string;
     type: string;
-    comment: string[];
+    comment: string;
 };
 
 export enum CalendarEINAPeriod {

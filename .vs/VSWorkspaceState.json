@@ -2,9 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\service",
+    "\\src\\controllers",
     "\\test"
   ],
-  "SelectedNode": "\\src\\service\\createCalendar.js",
+  "SelectedNode": "\\src\\rabbitmq.service.ts",
   "PreviewInSolutionExplorer": false
 }

@@ -17,29 +17,29 @@ export class CalendarEINAController {
     }
 
     @Post("createCalendarEINA")
-    async createCalendarEINA(@Body() periods: PeriodsCalendarEINA) {
-        var respond = await this.rabbitMQService.send('createCalendarEINA', periods);
+    async createCalendarEINA(@Body('course') course: string, @Body('version') version: number, @Body('periods') periods: PeriodsCalendarEINA) {
+        var respond = await this.rabbitMQService.send('createCalendarEINA', { course: course, version: version, periods: periods });
         if (respond == undefined) throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
-
         return respond;
     }
 
     @Post("listFirstSemesterCalendarEINA")
-    async listFirstSemesterCalendarEINA(@Body('year') year: number) {
-        return await this.listCalendarEINA(year, CalendarEINAPeriod.FIRST_QUARTER);
+    async listFirstSemesterCalendarEINA(@Body('course') course: string, @Body('version') version: number) {
+        return await this.listCalendarEINA(course, version, CalendarEINAPeriod.FIRST_QUARTER);
 
     }
     @Post("listSecondSemesterCalendarEINA")
-    async listSecondSemesterCalendarEINA(@Body('year') year: number) {
-        return await this.listCalendarEINA(year, CalendarEINAPeriod.SECOND_QUARTER);
+    async listSecondSemesterCalendarEINA(@Body('course') course: string, @Body('version') version: number) {
+        return await this.listCalendarEINA(course, version, CalendarEINAPeriod.SECOND_QUARTER);
 
-    }
+    } 
     @Post("listSecondConvocatoryCalendarEINA")
-    async listSecondConvocatoryCalendarEINA(@Body('year') year: number) {
-        return await this.listCalendarEINA(year, CalendarEINAPeriod.SECOND_CONVOCATORY);
+    async listSecondConvocatoryCalendarEINA(@Body('course') course: string, @Body('version') version: number) {
+        return await this.listCalendarEINA(course, version, CalendarEINAPeriod.SECOND_CONVOCATORY);
     }
-    async listCalendarEINA(year: number, period: CalendarEINAPeriod) {
-        var respond = await this.rabbitMQService.send('listPeriodCalendarEINA', { year: year, period: period });
+    async listCalendarEINA(course:string,version: number, period: CalendarEINAPeriod) {
+        var respond = await this.rabbitMQService.send('listPeriodCalendarEINA', { course: course, version: 1, period: period });
+        console.log("RESPOND ",JSON.stringify(respond))
         return respond.map(day => {
             let props = day._props;
             return {
@@ -53,21 +53,21 @@ export class CalendarEINAController {
     }
 
     @Post("deleteCalendarEINA")
-    async deleteCalendarEINA(@Body('year') year: number) {
-        var respond = await this.rabbitMQService.send('deleteCalendarEINA', year);
+    async deleteCalendarEINA(@Body('course') course: string, @Body('version') version: number) {
+        var respond = await this.rabbitMQService.send('deleteCalendarEINA', { course: course, version: version });
         if (respond == undefined) throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
 
         return respond;
     }
-    private getUTCDate(d: Date) {
+    private getUTCDate(d: Date) { 
         const date = new Date(d);
         let thisDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0));
         return thisDate;
     }
     @Post("editDayEINA")
-    async editDayEINA(@Body() dayData: DayData) {
+    async editDayEINA(@Body('dayData') dayData: DayData, @Body('course') course: string, @Body('version') version: number) {
         let thisComment = dayData.comment.length === 0 ? [] : [dayData.comment];
-        var respond = await this.rabbitMQService.send('editDayEINA', { date: this.getUTCDate(dayData.date), weekDay: WeekDayNumber.get(dayData.day), weekLetter: dayData.week?.toUpperCase(), state: dayData.type, comment: thisComment });
+        var respond = await this.rabbitMQService.send('editDayEINA', {day:{ date: this.getUTCDate(dayData.date), weekDay: WeekDayNumber.get(dayData.day), weekLetter: dayData.week?.toUpperCase(), state: dayData.type, comment: thisComment }, course:course, version:version});
         if (respond == undefined) throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
         return respond;
     }

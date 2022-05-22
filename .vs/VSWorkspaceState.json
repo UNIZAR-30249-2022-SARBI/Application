@@ -5,6 +5,6 @@
     "\\src\\controllers",
     "\\test"
   ],
-  "SelectedNode": "\\src\\rabbitmq.service.ts",
+  "SelectedNode": "\\src\\controllers\\calendarEINA.controller.ts",
   "PreviewInSolutionExplorer": false
 }

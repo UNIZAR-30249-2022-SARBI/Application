@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Post, Body, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { AppService } from '../app.service';
 import { RabbitMQService } from '../rabbitmq.service';
-import { CalendarEINAPeriod, DayData, PeriodsCalendarEINA, SpanishWeekDayLetter, WeekDayNumber } from './types';
+import { CalendarEINAPeriod, DayData, PeriodCalendarWord, PeriodsCalendarEINAData, SpanishWeekDayLetter, WeekDayNumber } from './types';
 @Controller()
 export class CalendarEINAController {
     constructor(
@@ -17,37 +17,60 @@ export class CalendarEINAController {
     }
 
     @Post("createCalendarEINA")
-    async createCalendarEINA(@Body('course') course: string, @Body('version') version: number, @Body('periods') periods: PeriodsCalendarEINA) {
+    async createCalendarEINA(@Body('course') course: string, @Body('version') version: number, @Body('periods') periods: PeriodsCalendarEINAData) {
         var respond = await this.rabbitMQService.send('createCalendarEINA', { course: course, version: version, periods: periods });
         if (respond == undefined) throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
         return respond;
     }
 
-    @Post("listFirstSemesterCalendarEINA")
-    async listFirstSemesterCalendarEINA(@Body('course') course: string, @Body('version') version: number) {
-        return await this.listCalendarEINA(course, version, CalendarEINAPeriod.FIRST_QUARTER);
-
+    @Post("editCalendarEINA")
+    async editCalendarEINA(@Body('course') course: string, @Body('version') version: number, @Body('periods') periods: PeriodsCalendarEINAData) {
+        var respond = await this.rabbitMQService.send('editCalendarEINA', { course: course, version: version, periods: periods });
+        if (respond == undefined) throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+        return respond;
     }
-    @Post("listSecondSemesterCalendarEINA")
-    async listSecondSemesterCalendarEINA(@Body('course') course: string, @Body('version') version: number) {
+    @Get("listPeriodsCalendarEINA/:course/:version")
+    async listPeriodsCalendarEINA(@Param('course') course: string, @Param('version') version: number) {
+        var respond = await this.rabbitMQService.send('listPeriodCalendarEINA', { course: course, version: version });
+        let periods = {};
+        respond?.forEach((period, index) => {
+            periods[PeriodCalendarWord.get(index)] = { startDate: period._startDate, endDate: period._endDate }
+            }
+        )
+        return periods;
+    }
+    @Get("listAllCalendars")
+    async listAllCalendars() {
+        var respond = await this.rabbitMQService.send('listAllCalendars', {});
+        return respond?.map(calendar => {
+            return {
+                course: calendar._course,
+                version: calendar._version,
+            };
+        });
+    }
+    @Get("listFirstSemesterCalendarEINA/:course/:version")
+    async listFirstSemesterCalendarEINA(@Param('course') course: string, @Param('version') version: number) {
+        return await this.listCalendarEINA(course, version, CalendarEINAPeriod.FIRST_QUARTER);
+    }
+    @Get("listSecondSemesterCalendarEINA/:course/:version")
+    async listSecondSemesterCalendarEINA(@Param('course') course: string, @Param('version') version: number) {
         return await this.listCalendarEINA(course, version, CalendarEINAPeriod.SECOND_QUARTER);
 
-    } 
-    @Post("listSecondConvocatoryCalendarEINA")
-    async listSecondConvocatoryCalendarEINA(@Body('course') course: string, @Body('version') version: number) {
+    }
+    @Get("listSecondConvocatoryCalendarEINA/:course/:version")
+    async listSecondConvocatoryCalendarEINA(@Param('course') course: string, @Param('version') version: number) {
         return await this.listCalendarEINA(course, version, CalendarEINAPeriod.SECOND_CONVOCATORY);
     }
     async listCalendarEINA(course:string,version: number, period: CalendarEINAPeriod) {
-        var respond = await this.rabbitMQService.send('listPeriodCalendarEINA', { course: course, version: 1, period: period });
-        console.log("RESPOND ",JSON.stringify(respond))
-        return respond.map(day => {
-            let props = day._props;
+        var respond = await this.rabbitMQService.send('listDaysByPeriodCalendarEINA', { course: course, version: version, period: period });
+        return respond?.map(day => {
             return {
-                date: props.date,
-                day: SpanishWeekDayLetter.get(props.weekDay),
-                week: props.weekLetter?.toLowerCase(),
-                type: props.state,
-                comment: props.comment,
+                date: day._date, 
+                day: SpanishWeekDayLetter.get(day._weekDay),
+                week: day._weekLetter?.toLowerCase(),
+                type: day._state,
+                comment: day._comment,
             };
         });
     }

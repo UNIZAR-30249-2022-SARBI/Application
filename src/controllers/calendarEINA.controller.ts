@@ -8,14 +8,6 @@ export class CalendarEINAController {
         private readonly rabbitMQService: RabbitMQService,
     ) { }
 
-    @Post("login")
-    async login(@Body('email') email) {
-        var respond = await this.rabbitMQService.send('respond', {
-            email: email,
-        });
-        return { email: respond };
-    }
-
     @Post("createCalendarEINA")
     async createCalendarEINA(@Body('course') course: string, @Body('version') version: number, @Body('periods') periods: PeriodsCalendarEINAData) {
         var respond = await this.rabbitMQService.send('createCalendarEINA', { course: course, version: version, periods: periods });

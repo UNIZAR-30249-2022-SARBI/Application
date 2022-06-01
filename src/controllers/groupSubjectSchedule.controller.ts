@@ -20,5 +20,6 @@ export class GrouptSubjectScheduleController {
                 period: group._period,
                 code: group._code
             };
-        });    }
+        });
+    }
 }

@@ -40,6 +40,7 @@ export class SubjectController {
         );
         return respond?.map(subject => {
             return {
+                id: subject._id,
                 name: subject._name,
                 code: subject._code,
             };

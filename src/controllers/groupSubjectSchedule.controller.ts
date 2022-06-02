@@ -22,4 +22,34 @@ export class GrouptSubjectScheduleController {
             };
         });
     }
+
+    @Post("addScheduleSlot")
+    async addScheduleSlot(@Body() data) {
+        var respond = await this.rabbitMQService.send('addScheduleSlot', data);
+        if (respond == undefined) throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+        return respond;
+    }
+
+    @Post("removeScheduleSlot")
+    async removeScheduleSlot(@Body() data) {
+        var respond = await this.rabbitMQService.send('removeScheduleSlot', data);
+        if (respond == undefined) throw new HttpException('Bad request', HttpStatus.BAD_REQUEST);
+        return respond;
+    }
+    
+    @Get("listScheduleByTeachingGroup/:code/:period")
+    async listScheduleByTeachingGroup(@Param('code') code: string, @Param('period') period: string) {
+        var respond = await this.rabbitMQService.send('listScheduleByTeachingGroup',
+            { code: code, period: period }
+        );
+        
+        return respond?.map(slot => {
+            return {
+                startHour: slot._startHour,
+                endHour: slot._endHour,
+                weekDay: slot._weekDay,
+                location: slot._location,
+            };
+        });
+    }
 }

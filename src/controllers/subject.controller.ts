@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Body, Query, HttpException, HttpStatus, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Param, Post, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { RmqRecordBuilder } from '@nestjs/microservices';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RabbitMQService } from '../rabbitmq.service';

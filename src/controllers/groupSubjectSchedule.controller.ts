@@ -1,8 +1,5 @@
-import { Controller, Get, Param, Post, Body, Query, HttpException, HttpStatus, UseInterceptors, UploadedFile } from '@nestjs/common';
-import { RmqRecordBuilder } from '@nestjs/microservices';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Get, Param, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { RabbitMQService } from '../rabbitmq.service';
-import * as fs from 'fs';
 
 @Controller()
 export class GrouptSubjectScheduleController {

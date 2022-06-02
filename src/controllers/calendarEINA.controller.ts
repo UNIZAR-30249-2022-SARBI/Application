@@ -1,5 +1,4 @@
 import { Controller, Get, Param, Post, Body, Query, HttpException, HttpStatus } from '@nestjs/common';
-import { AppService } from '../app.service';
 import { RabbitMQService } from '../rabbitmq.service';
 import { CalendarEINAPeriod, DayData, PeriodCalendarWord, PeriodsCalendarEINAData, SpanishWeekDayLetter, WeekDayNumber } from './types';
 @Controller()
